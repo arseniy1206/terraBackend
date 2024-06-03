@@ -1,0 +1,6 @@
+@Terra.Server_HostAddress = http://localhost:5084
+
+GET {{Terra.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
