@@ -1,0 +1,6 @@
+@Terra.Server_HostAddress = http://arseniy1206-terrabackend-06b3.twc1.net
+
+GET {{Terra.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
