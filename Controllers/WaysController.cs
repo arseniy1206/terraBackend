@@ -80,8 +80,8 @@ namespace Terra.Server.Controllers
             return CreatedAtAction("GetWay", new { id = way.Id }, way);
         }
 
-        // DELETE: api/Ways/5
-        [HttpDelete("{id}")]
+        // DELETE: api/Ways/5/del
+        [HttpDelete("{id}/del")]
         public async Task<IActionResult> DeleteWay(int id)
         {
             var remoteIpAddress = HttpContext.Connection.RemoteIpAddress;
