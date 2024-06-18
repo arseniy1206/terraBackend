@@ -84,12 +84,18 @@ namespace Terra.Server.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteWay(int id)
         {
-            var remoteIpAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            var remoteIpAddress = HttpContext.Connection.RemoteIpAddress;
+
+            if (remoteIpAddress != null && remoteIpAddress.IsIPv4MappedToIPv6)
+            {
+                remoteIpAddress = remoteIpAddress.MapToIPv4();
+            }
+
             var allowedIPs = _configuration.GetSection("AllowedIPs").Get<List<string>>();
 
-            if (!allowedIPs.Contains(remoteIpAddress))
+            if (!allowedIPs.Contains(remoteIpAddress?.ToString()))
             {
-                return Unauthorized($"Access denied from this IP address {remoteIpAddress}");
+                return Unauthorized("Access denied from this IP address");
             }
 
             var way = await _context.Way.FindAsync(id);
@@ -103,6 +109,7 @@ namespace Terra.Server.Controllers
 
             return NoContent();
         }
+
 
         private bool WayExists(int id)
         {
