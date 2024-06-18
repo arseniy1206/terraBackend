@@ -95,7 +95,7 @@ namespace Terra.Server.Controllers
 
             if (!allowedIPs.Contains(remoteIpAddress?.ToString()))
             {
-                return Unauthorized("Access denied from this IP address");
+                return Unauthorized($"Access denied from this IP address {remoteIpAddress}");
             }
 
             var way = await _context.Way.FindAsync(id);
