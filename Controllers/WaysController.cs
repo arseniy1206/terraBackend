@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,10 +15,13 @@ namespace Terra.Server.Controllers
     public class WaysController : ControllerBase
     {
         private readonly TerraServerContext _context;
+        private readonly IConfiguration _configuration;
 
-        public WaysController(TerraServerContext context)
+        public WaysController(TerraServerContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
+
         }
 
         // GET: api/Ways
@@ -81,6 +84,14 @@ namespace Terra.Server.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteWay(int id)
         {
+            var remoteIpAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            var allowedIPs = _configuration.GetSection("AllowedIPs").Get<List<string>>();
+
+            if (!allowedIPs.Contains(remoteIpAddress))
+            {
+                return Unauthorized($"Access denied from this IP address {remoteIpAddress}");
+            }
+
             var way = await _context.Way.FindAsync(id);
             if (way == null)
             {
