@@ -84,20 +84,16 @@ namespace Terra.Server.Controllers
         [HttpDelete("{id}/del")]
         public async Task<IActionResult> DeleteWay(int id)
         {
-            var remoteIpAddress = HttpContext.Connection.RemoteIpAddress;
+            var remoteIpAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            if (!HttpContext.Request.Headers.TryGetValue("ApiKey", out var extractedApiKey))
+                return Unauthorized("The API key is missing");
 
-            if (remoteIpAddress != null && remoteIpAddress.IsIPv4MappedToIPv6)
+            var validApiKeys = _configuration.GetSection("ApiKeys:ValidKeys").Get<List<string>>();
+
+            if (!validApiKeys.Contains(extractedApiKey))
             {
-                remoteIpAddress = remoteIpAddress.MapToIPv4();
+                return Unauthorized("Incorrect key");
             }
-
-            var allowedIPs = _configuration.GetSection("AllowedIPs").Get<List<string>>();
-
-            if (!allowedIPs.Contains(remoteIpAddress?.ToString()))
-            {
-                return Unauthorized($"Access denied from this IP address {remoteIpAddress}");
-            }
-
             var way = await _context.Way.FindAsync(id);
             if (way == null)
             {
@@ -106,8 +102,7 @@ namespace Terra.Server.Controllers
 
             _context.Way.Remove(way);
             await _context.SaveChangesAsync();
-
-            return NoContent();
+            return Ok("Sucsess");
         }
 
 
